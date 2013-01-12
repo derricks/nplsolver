@@ -1,0 +1,22 @@
+// a variety of refactored tools for transforming strings into other, more-optimized-for-matching strings
+package transform
+
+import (
+  "strings"
+  "sort"
+)
+
+// given "hello" this will return "ehllo"
+func SortAllCharacters(word string) string {
+  chars := splitStringIntoCharacters(word)
+  sort.Strings(chars)
+  return joinCharsIntoString(chars)
+}
+
+func splitStringIntoCharacters(word string) []string {
+  return strings.Split(word,"")
+}
+
+func joinCharsIntoString(chars []string) string {
+  return strings.Join(chars,"")
+}
