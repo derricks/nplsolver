@@ -20,7 +20,7 @@ func TestInMemoryDictionary(t *testing.T) {
   hello := "hello"
   testing := "testing"
   
-  dict,_ := NewDictionaryFromWords([]string{hello,testing})
+  dict,_ := NewDictionaryFromWords(hello,testing)
   
   shouldBeHello := dict.NextEntry().Word()
   if shouldBeHello != hello {
