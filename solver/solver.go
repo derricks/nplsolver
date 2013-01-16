@@ -5,26 +5,68 @@ import (
   "regexp"
   "nplsolver/dict"
   "nplsolver/transform"
+  "strings"
+//  "errors"
 )
 
-type MatcherType int
+type SolverType int
 
 const (
-   Identity = iota
+  Basic = iota
 )
 
-func NewIdentityMatcher() (Matcher,error) {
-  return IdentityMatcher{},nil
+// get an appropriate solver object
+func GetSolver(solverType SolverType) (Solver,error) {
+   var solver Solver
+   switch int(solverType) {
+     case Basic:
+        solver = BasicSolver{}
+   }
+   return solver,nil
 }
-func NewSameCharacterMatcher() (Matcher,error) {
-  return SameCharactersMatcher{},nil
+
+// The basic behavior for a Solver, a thing that works with a puzzle and a Dictionary to find matches.
+// matches are written to the receiving channel. when finished, the solver writes to done_channel (either itself or an error)
+type Solver interface {
+   Solve(pattern string, dict dict.Dictionary, sols_channel chan<- string, done_channel chan<- interface{}) 
 }
-func NewRegexMatcher(regex string) (matcher Matcher, err error) {
+
+type BasicSolver struct {}
+func (solver BasicSolver) Solve(pattern string, dictionary dict.Dictionary, results chan<- string, done_channel chan<- interface{}) {
+   
+   regex := convertBasicSearchWildcardsToRegex(pattern)
+   if matcher,err := newRegexMatcher(regex); err != nil {
+      done_channel <- err
+   } else {
+      dictionary.Iterate(func(entry dict.Entry) {
+         if matcher.Match(regex,entry) {
+            results <- entry.Word()
+         }      
+      })   
+     done_channel <- solver
+     
+   }
+}
+
+// convert the pattern (which takes ? for single-character matches and * for multi-character matches) to a regex
+func convertBasicSearchWildcardsToRegex(basicSearchPattern string) (regexPattern string) {
+   regexPattern = strings.Replace(basicSearchPattern,"?",".",-1)
+   regexPattern = strings.Replace(regexPattern,"*",".*",-1)
+   return
+}
+
+func newIdentityMatcher() (Matcher,error) {
+  return identityMatcher{},nil
+}
+func newSameCharacterMatcher() (Matcher,error) {
+  return sameCharactersMatcher{},nil
+}
+func newRegexMatcher(regex string) (matcher Matcher, err error) {
   var compiled *regexp.Regexp
   if compiled,err = regexp.Compile(regex); err != nil {
      return nil,err
   }
-  return RegexMatcher{compiled},nil
+  return regexMatcher{compiled},nil
 }
 
 // The Matcher interface defines the ability to look at a word and see if it lines up with a dictionary entry.
@@ -40,34 +82,34 @@ type Matcher interface {
 
 
 // Verifies that the passed word precisely matches the word in the dictionary. This doesn't have much external use, but provides a testing hook.
-type IdentityMatcher struct{}
+type identityMatcher struct{}
 
-func (matcher IdentityMatcher) Match(word string, dictEntry dict.Entry) bool {
+func (matcher identityMatcher) Match(word string, dictEntry dict.Entry) bool {
   return word == dictEntry.Word()
 }
-func (matcher IdentityMatcher) MatchTransformed(word string, dictEntry dict.Entry) bool {
+func (matcher identityMatcher) MatchTransformed(word string, dictEntry dict.Entry) bool {
   // in this case, it's the same
   return matcher.Match(word,dictEntry)
 }
 
 // checks that two words have the exact same letters
-type SameCharactersMatcher struct{}
+type sameCharactersMatcher struct{}
 
-func (matcher SameCharactersMatcher) Match(word string, dictEntry dict.Entry) bool {
+func (matcher sameCharactersMatcher) Match(word string, dictEntry dict.Entry) bool {
   return matcher.MatchTransformed(transform.SortAllCharacters(word),dictEntry)
 }
-func (matcher SameCharactersMatcher) MatchTransformed(word string, dictEntry dict.Entry) bool {
+func (matcher sameCharactersMatcher) MatchTransformed(word string, dictEntry dict.Entry) bool {
   return word == dictEntry.LettersOrdered()
 }
 
 // a matcher that checks to see if an entry's raw word matches the regex
-type RegexMatcher struct{
+type regexMatcher struct{
    *regexp.Regexp
 }
-func (matcher RegexMatcher) Match(word string, dictEntry dict.Entry) bool {
+func (matcher regexMatcher) Match(word string, dictEntry dict.Entry) bool {
    return matcher.MatchString(dictEntry.Word())
 }
-func (matcher RegexMatcher) MatchTransformed(word string, dictEntry dict.Entry) bool {
+func (matcher regexMatcher) MatchTransformed(word string, dictEntry dict.Entry) bool {
    return matcher.Match(word,dictEntry)
 }
 
