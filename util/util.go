@@ -13,7 +13,7 @@ const (
 )
 
 // Process a byte-delimited text file by calling lineHandler for each non-empty (i.e., non-whitespace-containing) line
-func ProcessNonEmptyFileLines(filePath string, delim byte, lineHandler func(line string)) error {
+func ProcessNonEmptyFileLines(filePath string, delim byte, lineHandler func(line string) error) error {
    file, err := os.Open(filePath)
    if (err != nil) {
       return err
@@ -26,7 +26,12 @@ func ProcessNonEmptyFileLines(filePath string, delim byte, lineHandler func(line
        if IsStringEmpty(line) {
           continue
        }
-       lineHandler(strings.Trim(line,Whitespace))
+       
+       lineErr := lineHandler(strings.Trim(line,Whitespace))
+       if lineErr != nil {
+          return lineErr
+       }
+       
        if err == io.EOF {
           break
        }

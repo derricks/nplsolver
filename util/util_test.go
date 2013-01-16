@@ -17,7 +17,7 @@ func TestIsStringEmpty(t *testing.T) {
 func TestFileProcessing(t *testing.T) {
    var foundLine1, foundLine2 bool
    
-   ProcessNonEmptyFileLines("./test_file.txt",'\n', func(line string) {
+   ProcessNonEmptyFileLines("./test_file.txt",'\n', func(line string) error {
       if line == "line1" {
          foundLine1 = true
       } else if line == "line2" {
@@ -25,6 +25,8 @@ func TestFileProcessing(t *testing.T) {
       } else {
          t.Errorf("Unexpected line in test file: %v",line)
       }
+      
+      return nil
    })
    
    if !(foundLine1 && foundLine2) {
