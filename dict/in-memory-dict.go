@@ -16,11 +16,16 @@ func (dict *inMemoryDictionary) NextEntry() Entry {
    return entry
 }
 
-func (dict *inMemoryDictionary) Close() { // no-op
+func (dict *inMemoryDictionary) Close() { 
+   dict.index = 0 // allow the dictionary to be re-used
+}
+
+func (dict *inMemoryDictionary) Iterate(handler func(entry Entry)) {
+  iterateOverDictionaryEntries(dict,handler)
 }
 
 // returns an in-memory dictionary with the specified words. primarily used for testing
-func newDictionaryFromWords(words []string) (Dictionary,error) {
+func NewDictionaryFromWords(words ...string) (Dictionary,error) {
   // make a list of Entry objects derived from those words
   entries := make([]Entry,0,len(words)) // specify initial length (0) and capacity to ensure entries get written at 0
 

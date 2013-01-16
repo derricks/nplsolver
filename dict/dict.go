@@ -12,6 +12,16 @@ type Dictionary interface {
    
    // tells the dictionary to shut down any resources it was using
    Close()
+   
+   // iterate over each entry in the dictionary, applying the relevant function
+   Iterate(handler func(entry Entry))
+}
+
+// refactored method for walking the dictionary entries and passing each entry to the function
+func iterateOverDictionaryEntries(dictionary Dictionary, entryHandler func(entry Entry)) {
+  for curEntry := dictionary.NextEntry(); curEntry != nil; curEntry = dictionary.NextEntry()   {
+    entryHandler(curEntry)
+  }
 }
 
 // Given a text file of words, one per line, make a new file that has optimized lookups for different kinds of word patterns

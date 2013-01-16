@@ -38,3 +38,30 @@ func TestInMemoryDictionary(t *testing.T) {
   }
 }
 
+func TestDictionaryIterator(t *testing.T) {
+  hello := "hello"
+  testing := "testing"
+  
+  var foundHello,foundTesting bool
+  
+  dict,_ := NewDictionaryFromWords(hello,testing)
+  
+  dict.Iterate(func(entry Entry) {
+     t.Logf("entry word: %v",entry.Word())
+     if entry.Word() == hello {
+        foundHello = true
+     }
+     
+     if entry.Word() == testing {
+        if !foundHello {
+           t.Errorf("testing was seen before hello")
+        }
+        foundTesting = true
+     }
+  })
+  
+  if !(foundHello && foundTesting) {
+     t.Errorf("Hello and testing were not found by the iterator")
+  }
+}
+
