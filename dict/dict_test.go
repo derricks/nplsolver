@@ -47,7 +47,6 @@ func TestDictionaryIterator(t *testing.T) {
   dict,_ := NewDictionaryFromWords(hello,testing)
   
   dict.Iterate(func(entry Entry) {
-     t.Logf("entry word: %v",entry.Word())
      if entry.Word() == hello {
         foundHello = true
      }
