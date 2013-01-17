@@ -24,7 +24,11 @@ func ProcessNonEmptyFileLines(filePath string, delim byte, lineHandler func(line
    
    for line,err := reader.ReadString(delim); true; line,err = reader.ReadString(delim) {
        if IsStringEmpty(line) {
-          continue
+          if err == io.EOF {
+             break
+          } else {
+            continue
+          }
        }
        
        lineErr := lineHandler(strings.Trim(line,Whitespace))
