@@ -2,8 +2,11 @@
 package dict
 
 import (
-//  "io"
-  "bufio"
+   "os"
+   "bufio"
+   "strings"
+   "fmt"
+   "nplsolver/util"
 )
 
 type Dictionary interface {
@@ -26,17 +29,32 @@ func iterateOverDictionaryEntries(dictionary Dictionary, entryHandler func(entry
 
 // Given a text file of words, one per line, make a new file that has optimized lookups for different kinds of word patterns
 func MakeDictionaryFromTextFile(source string, dest string) error {
+
+  // open the new file (trunc if it already exists)
+  destFile, destErr := os.Create(dest)
+  if destErr != nil {
+     return destErr
+  }
+  defer destFile.Close()
+  destWriter := bufio.NewWriter(destFile)
+  
+  writeErr := util.ProcessNonEmptyFileLines(source, '\n', func(line string) error {
+      entry, entryErr := NewEntryFromWord(line)
+      if entryErr != nil {
+         return entryErr
+      }
+  
+      destLine := fmt.Sprintf("%v\n",strings.Join(entry,"\t"))
+      destWriter.WriteString(destLine)
+      return nil
+  })
+  
+  if writeErr != nil {
+     return writeErr
+  }
+
+  destWriter.Flush()
+
   return nil  
 }
-
-// Creates a new dictionary based off of reading a file
-func NewDictionaryFromFile(filename string) (Dictionary,error) {
-   return nil,nil
-}
-
-type fileDictionary struct {
-   bufio.Reader
-}
-
-
 

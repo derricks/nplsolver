@@ -38,13 +38,12 @@ func (solver BasicSolver) Solve(pattern string, dictionary dict.Dictionary, resu
    if matcher,err := newRegexMatcher(regex); err != nil {
       done_channel <- err
    } else {
-      dictionary.Iterate(func(entry dict.Entry) {
-         if matcher.Match(regex,entry) {
-            results <- entry.Word()
-         }      
-      })   
-     done_channel <- solver
-     
+        dictionary.Iterate(func(entry dict.Entry) {
+           if matcher.Match(regex,entry) {
+              results <- entry.Word()
+           }      
+        })   
+       done_channel <- solver
    }
 }
 

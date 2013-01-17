@@ -38,53 +38,62 @@ func TestRegexMatching(t *testing.T) {
 }
 
 func TestBasicSolverBehavior(t *testing.T) {
-  // create a dictionary of words we want to test against
-  dict,_ := getDictionaryForBasicSolver()
   
-  //create the channels for results and signalling done status
-  resultsChan := make(chan string)
-  doneChan := make(chan interface{})
-  
-  doneReceived := false
-  results := make([]string,10)
-  resultsMap := make(map[string]bool) // just to see if various words have been found
-   
   // get a basic solver and run the following tests with the dictionary
   solver,_ := GetSolver(Basic)
-  
-  //  "stor*" should return "stork","store",and "story"
-  go solver.Solve("stor*",dict,resultsChan,doneChan)
-  
-  var curResult string
-  for doneReceived != true {
-     select {
-        case curResult = <-resultsChan:
-          results = append(results,curResult)
-          resultsMap[curResult] = true
-        case item := <-doneChan:
-          t.Logf("Set up error handling for item: %v\n",item)
-          doneReceived = true
-     }
-  }
-  
-  // verify results  
-  t.Logf("results: %v\n",results)
+  _,resultsMap := solveForBasicSearchPattern("stor*",solver,t)  
   expectedResults := []string{"stork","store","story"}
   if !verifyWordsInMap(expectedResults,resultsMap) {
-     t.Error("Not all words were in result map")
+     t.Errorf("Not all words from %v were in result map",expectedResults)
   }
 
-
-//      "stor?" should return the same thing
-//      "st?r*" should return the same list plus "stare"
-//      "*" should return every word in the dictionary
-      
-
+  _,resultsMap = solveForBasicSearchPattern("stor?",solver,t)
+  expectedResults = []string{"stork","store","story"}
+  if !verifyWordsInMap(expectedResults,resultsMap) {
+     t.Errorf("Not all words from %v were in result map",expectedResults)
+  }
   
+  _,resultsMap = solveForBasicSearchPattern("st*re",solver,t)
+  expectedResults = []string{"stare","store"}  
+  if !verifyWordsInMap(expectedResults,resultsMap) {
+    t.Errorf("Not all words from %v were in results map", expectedResults)
+  }
+ 
 }
+
+// refactored code for getting results from a basic solver with a particular pattern
+func solveForBasicSearchPattern(pattern string, solver Solver,t *testing.T) (results []string, resultsMap map[string]bool) {
+    results = make([]string,10)
+    resultsMap = make(map[string]bool)
+    resultsChan := make(chan string)
+    doneChan := make(chan interface{})
+   
+    doneReceived := false
+    dictionary,_ := getDictionaryForBasicSolver()
+    go solver.Solve(pattern,dictionary,resultsChan,doneChan)
+
+    var curResult string
+    for doneReceived != true {
+      select {
+         case curResult = <-resultsChan:
+            results = append(results,curResult)
+            resultsMap[curResult] = true
+         case item := <- doneChan:
+            t.Logf("TODO: test error handling for item: %v\n",item)
+            doneReceived = true
+      }
+    }
+    return results,resultsMap
+}
+
+
 
 // look up each item in the slice and see if it's in the map. return false if any fails
 func verifyWordsInMap(words []string, wordsMap map[string]bool) bool {
+  if len(words) != len(wordsMap) {
+    return false
+  }
+  
   for _,word := range words {
      if _,found := wordsMap[word]; !found {
         return false
