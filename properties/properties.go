@@ -7,10 +7,6 @@ import (
    "nplsolver/util"
 )
 
-const (
-  whitespace = "\t\n "
-)
-
 type properties map[string]string
 
 var props properties
@@ -32,6 +28,9 @@ func LoadPropertiesFromFiles(files ...string) error {
 
 func loadPropertiesFromFile(propFile string) error {
   err := util.ProcessNonEmptyFileLines(propFile, '\n', func(line string) error {
+     if lineIsComment(line) {
+        return nil
+     }
      key, value := parsePropertyLine(line)  
      props[key] = value
      return nil
@@ -43,9 +42,13 @@ func loadPropertiesFromFile(propFile string) error {
   return nil
 }
 
+func lineIsComment(line string) bool {
+   return strings.HasPrefix(strings.Trim(line,util.Whitespace),"#")
+}
+
 func parsePropertyLine(line string) (key string, value string) {
    splitLine := strings.Split(line,"=")
-   return strings.Trim(splitLine[0],whitespace),strings.Trim(splitLine[1],whitespace)
+   return strings.Trim(splitLine[0],util.Whitespace),strings.Trim(splitLine[1],util.Whitespace)
 }
 
 func Get(propertyName string) (propertyValue string) {
