@@ -2,6 +2,7 @@
 package util
 
 import (
+"fmt"
    "io"
    "os"
    "bufio"
@@ -11,6 +12,16 @@ import (
 const (
    Whitespace = "\t\r\n "
 )
+
+// Check to make sure the file exists
+func DoesFileExist(path string) bool {
+  _, err := os.Stat(path)
+  fmt.Printf("does file exist: %v\n",err)
+  if err != nil && os.IsNotExist(err) {
+     return false
+  } 
+  return true
+}
 
 // Process a byte-delimited text file by calling lineHandler for each non-empty (i.e., non-whitespace-containing) line
 func ProcessNonEmptyFileLines(filePath string, delim byte, lineHandler func(line string) error) error {

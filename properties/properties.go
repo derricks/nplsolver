@@ -32,7 +32,7 @@ func loadPropertiesFromFile(propFile string) error {
         return nil
      }
      key, value := parsePropertyLine(line)  
-     props[key] = value
+     set(key,value)
      return nil
   })
   
@@ -53,4 +53,8 @@ func parsePropertyLine(line string) (key string, value string) {
 
 func Get(propertyName string) (propertyValue string) {
    return props[propertyName]
+}
+
+func set(key string, value string) {
+   props[key] = value
 }

@@ -33,3 +33,9 @@ func TestFileProcessing(t *testing.T) {
      t.Errorf("Did not receive line1 or line2 in test")
    }
 }
+
+func TestDoesFileExist(t *testing.T) {
+  if !DoesFileExist("./util_test.go") {
+     t.Error("util_test.go does not exist in directory")
+  }
+}
