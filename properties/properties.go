@@ -4,6 +4,7 @@ package properties
 
 import (
    "strings"
+   "strconv"
    "nplsolver/util"
 )
 
@@ -53,6 +54,11 @@ func parsePropertyLine(line string) (key string, value string) {
 
 func Get(propertyName string) (propertyValue string) {
    return props[propertyName]
+}
+
+// tries to cast the value to an integer, returns error if it can't
+func GetInteger(propertyName string) (int64,error) {
+   return strconv.ParseInt(Get(propertyName),0,64)
 }
 
 func set(key string, value string) {
