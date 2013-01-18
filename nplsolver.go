@@ -9,8 +9,8 @@ import (
    "path/filepath"
    "nplsolver/dict"
    "nplsolver/properties"
+   "nplsolver/server"
    "nplsolver/util"
-   "nplsolver/solver"
 )
 
 const (
@@ -19,7 +19,7 @@ const (
 
 // main makes sure dictionaries and caches are set up and then sits on a socket waiting for commands
 func main() {
-  fmt.Println("Started NPL Solver Server")
+  fmt.Println("Starting NPL Solver Server")
   
   // load all the properties
   err := properties.LoadPropertiesFromFiles("./solver.properties")
@@ -38,13 +38,14 @@ func main() {
   err = checkDictionaries()
   assertError("Could not make dictionaries",err)
   
-  
+  fmt.Printf("Server started on port %v\n",properties.Get("server.port"))
+  server.StartServer()
  }
 
 // Will panic with the given message if err is not nil
 func assertError(message string,err error) {
   if err != nil {
-     fmt.Printf("Error: %v, %v\n",message,err)
+     panic(fmt.Sprintf("Error: %v, %v\n",message,err))
   }
 }
 
