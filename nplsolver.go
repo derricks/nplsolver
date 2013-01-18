@@ -10,6 +10,7 @@ import (
    "nplsolver/dict"
    "nplsolver/properties"
    "nplsolver/util"
+   "nplsolver/solver"
 )
 
 const (
@@ -36,7 +37,9 @@ func main() {
   
   err = checkDictionaries()
   assertError("Could not make dictionaries",err)
-}
+  
+  
+ }
 
 // Will panic with the given message if err is not nil
 func assertError(message string,err error) {
@@ -91,10 +94,5 @@ func getDictionaryNames() []string {
        return make([]string,0,0)
     }
     
-    fmt.Printf("dictionaryAliasesProp %v\n",dictionaryAliasesProp)
-
-    if !strings.Contains(dictionaryAliasesProp,comma) {
-       return []string{dictionaryAliasesProp}
-    }
-    return strings.Split(dictionaryAliasesProp,comma)
+   return strings.Split(dictionaryAliasesProp,comma)
 }

@@ -2,7 +2,6 @@
 package util
 
 import (
-"fmt"
    "io"
    "os"
    "bufio"
@@ -16,7 +15,6 @@ const (
 // Check to make sure the file exists
 func DoesFileExist(path string) bool {
   _, err := os.Stat(path)
-  fmt.Printf("does file exist: %v\n",err)
   if err != nil && os.IsNotExist(err) {
      return false
   } 

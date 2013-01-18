@@ -7,6 +7,7 @@ import (
    "strings"
    "fmt"
    "nplsolver/util"
+   "nplsolver/properties"
 )
 
 type Dictionary interface {
@@ -56,5 +57,23 @@ func MakeDictionaryFromTextFile(source string, dest string) error {
   destWriter.Flush()
 
   return nil  
+}
+
+func getDictionaryNamePropForName(name string) string {
+  return fmt.Sprintf("dictionaries.%v.name",name)
+}
+
+func getDictionaryPathPropForName(name string) string {
+  return fmt.Sprintf("dictionaries.%v.path",name)
+}
+// Given a Dictionary name, returns the prop for the dictionary name and the dictionary cache file
+func GetDictionaryPropsForName(name string) (string,string) {
+  return getDictionaryNamePropForName(name),getDictionaryPathPropForName(name)
+}
+
+// figures out the cached file for the given dictionary name
+func FindDictionaryByName(dictName string) (dict Dictionary,err error) {
+   dictName,dictPath := GetDictionaryPropsForName(dictName)
+   return NewDictionaryFromFile(properties.Get(dictPath))
 }
 

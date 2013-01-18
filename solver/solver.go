@@ -51,7 +51,7 @@ func (solver BasicSolver) Solve(pattern string, dictionary dict.Dictionary, resu
 func convertBasicSearchWildcardsToRegex(basicSearchPattern string) (regexPattern string) {
    regexPattern = strings.Replace(basicSearchPattern,"?",".",-1)
    regexPattern = strings.Replace(regexPattern,"*",".*",-1)
-   return
+   return "^" + regexPattern 
 }
 
 func newIdentityMatcher() (Matcher,error) {

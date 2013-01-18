@@ -64,3 +64,14 @@ func TestDictionaryIterator(t *testing.T) {
   }
 }
 
+func TestDictionaryPropKeys(t *testing.T) {
+   nameProp, pathProp := GetDictionaryPropsForName("enable")
+   if nameProp != "dictionaries.enable.name" {
+      t.Errorf("dictionary name property is incorrect: %v",nameProp)
+   }
+   
+   if pathProp != "dictionaries.enable.path" {
+      t.Errorf("dictionary path property is incorrect: %v",pathProp)
+   }
+}
+
