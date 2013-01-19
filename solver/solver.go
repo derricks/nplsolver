@@ -2,28 +2,35 @@
 package solver
 
 import (
+  "fmt"
   "regexp"
   "nplsolver/dict"
   "nplsolver/transform"
   "strings"
-//  "errors"
+  "errors"
 )
 
-type SolverType int
+type SolverType string
 
 const (
-  Basic = iota
+  Basic = "basic"
 )
 
 // get an appropriate solver object
 func GetSolver(solverType SolverType) (Solver,error) {
    var solver Solver
-   switch int(solverType) {
+   switch strings.ToLower(string(solverType)) {
      case Basic:
         solver = BasicSolver{}
    }
-   return solver,nil
+   
+   if solver != nil {
+     return solver,nil
+   }
+   
+   return nil,errors.New(fmt.Sprintf("No server found for type %v",solverType))
 }
+
 
 // The basic behavior for a Solver, a thing that works with a puzzle and a Dictionary to find matches.
 // matches are written to the receiving channel. when finished, the solver writes to done_channel (either itself or an error)
