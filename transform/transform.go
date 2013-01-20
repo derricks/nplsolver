@@ -13,6 +13,22 @@ func SortAllCharacters(word string) string {
   return joinCharsIntoString(chars)
 }
 
+// given "hello", this will return "ehlo"
+func UniqueSortedCharacters(word string) string {
+   letterMap := make(map[string]bool)
+   
+   for _,char := range word {
+      letterMap[string(char)] = true
+   }
+   
+   chars := make([]string,len(word))
+   for char := range letterMap {
+      chars = append(chars,char)
+   }
+   sort.Strings(chars)
+   return joinCharsIntoString(chars)   
+}
+
 func splitStringIntoCharacters(word string) []string {
   return strings.Split(word,"")
 }
