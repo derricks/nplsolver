@@ -4,6 +4,7 @@ import (
    "bufio"
    "os"
    "strings"
+   "nplsolver/util"
 )
 
 const (
@@ -33,7 +34,9 @@ func (dict fileDictionary) NextEntry() Entry {
    if err != nil {
       return nil;
    }
-   return Entry(strings.Split(line,tab))
+   trimmedLine := strings.Trim(line,util.Whitespace)
+   entry := Entry(strings.Split(trimmedLine,tab))
+   return entry
 }
 
 func (dict fileDictionary) Close() {

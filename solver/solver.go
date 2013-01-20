@@ -14,6 +14,7 @@ type SolverType string
 
 const (
   Basic = "basic"
+  Transposal = "transposal"
 )
 
 // get an appropriate solver object
@@ -22,6 +23,8 @@ func GetSolver(solverType SolverType) (Solver,error) {
    switch strings.ToLower(string(solverType)) {
      case Basic:
         solver = BasicSolver{}
+     case Transposal:
+        solver = TransposalSolver{}
    }
    
    if solver != nil {
@@ -59,6 +62,24 @@ func convertBasicSearchWildcardsToRegex(basicSearchPattern string) (regexPattern
    regexPattern = strings.Replace(basicSearchPattern,"?",".",-1)
    regexPattern = strings.Replace(regexPattern,"*",".*",-1)
    return "^" + regexPattern 
+}
+
+type TransposalSolver struct{}
+func (solver TransposalSolver) Solve(pattern string, dictionary dict.Dictionary, results chan<- string, done_channel chan<- interface{}) {
+    //transform the pattern into its ordered set of letters
+    transformedString := transform.SortAllCharacters(pattern)
+    
+    if matcher,err := newSameCharacterMatcher(); err != nil {
+       done_channel <- err
+    } else {
+       // search for any item in the dictionary that has the same unordered set (using MatchTransformed)
+       dictionary.Iterate(func(entry dict.Entry) {
+          if matcher.MatchTransformed(transformedString,entry) {
+             results <- entry.Word()
+          }
+       })
+       done_channel <- solver
+    }
 }
 
 func newIdentityMatcher() (Matcher,error) {

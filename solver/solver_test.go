@@ -61,15 +61,29 @@ func TestBasicSolverBehavior(t *testing.T) {
  
 }
 
+func TestTransposalSolver(t *testing.T) {
+   solver,_ := GetSolver(Transposal)
+   dictionary,_ := getDictionaryForBasicSolver()
+   _,resultsMap := solveForAny("rates",solver,dictionary,t)
+   if !verifyWordsInMap([]string{"stare"},resultsMap) {
+      t.Errorf("stare was not found in dictionary")
+   }
+}
+
 // refactored code for getting results from a basic solver with a particular pattern
 func solveForBasicSearchPattern(pattern string, solver Solver,t *testing.T) (results []string, resultsMap map[string]bool) {
+    dictionary,_ := getDictionaryForBasicSolver()
+    return solveForAny(pattern,solver, dictionary, t)
+}
+
+// refactored code for getting search results
+func solveForAny(pattern string, solver Solver, dictionary dict.Dictionary, t *testing.T) (results []string, resultsMap map[string]bool) {
     results = make([]string,10)
     resultsMap = make(map[string]bool)
     resultsChan := make(chan string)
     doneChan := make(chan interface{})
    
     doneReceived := false
-    dictionary,_ := getDictionaryForBasicSolver()
     go solver.Solve(pattern,dictionary,resultsChan,doneChan)
 
     var curResult string
@@ -79,8 +93,11 @@ func solveForBasicSearchPattern(pattern string, solver Solver,t *testing.T) (res
             results = append(results,curResult)
             resultsMap[curResult] = true
          case item := <- doneChan:
-            t.Logf("TODO: test error handling for item: %v\n",item)
             doneReceived = true
+            switch item.(type) {
+               case error:
+                  t.Errorf("Error during search %v",item)
+            }
       }
     }
     return results,resultsMap

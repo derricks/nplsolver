@@ -140,7 +140,6 @@ func readData(conn net.Conn) (query,error) {
 
 // takes a response object and writes it back down the socket with the same format (2 bytes for length and then json string)
 func writeResponse(conn net.Conn, res response) error {
-  fmt.Printf("Sending back %v\n",res)
   bytes,err := json.Marshal(res)
   if err != nil {
      return err

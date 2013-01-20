@@ -6,6 +6,7 @@ import (
    "bufio"
    "strings"
    "fmt"
+   "path/filepath"
    "nplsolver/util"
    "nplsolver/properties"
 )
@@ -71,9 +72,25 @@ func GetDictionaryPropsForName(name string) (string,string) {
   return getDictionaryNamePropForName(name),getDictionaryPathPropForName(name)
 }
 
+func getCachedDictionaryFile(dictName string) (filename string, err error) {
+  var cacheDir string
+  if cacheDir,err = filepath.Abs(properties.Get("server.cache.dir")); err != nil {
+    return "",err
+  }
+  
+  dictProp := getDictionaryNamePropForName(dictName)
+  cachedFileName := strings.Join([]string{cacheDir,properties.Get(dictProp)},string(os.PathSeparator))
+  return cachedFileName,nil
+}
+
 // figures out the cached file for the given dictionary name
-func FindDictionaryByName(dictName string) (dict Dictionary,err error) {
-   dictName,dictPath := GetDictionaryPropsForName(dictName)
-   return NewDictionaryFromFile(properties.Get(dictPath))
+func FindDictionaryByName(name string) (dict Dictionary,err error) {
+   
+   // use the _cached_ dictionary file as the source
+   var cachedDictPath string
+   if cachedDictPath,err = getCachedDictionaryFile(name); err != nil {
+       return nil,err
+   }
+   return NewDictionaryFromFile(cachedDictPath)
 }
 
