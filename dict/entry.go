@@ -47,5 +47,6 @@ func NewEntryFromWord(newWord string) (Entry,error) {
    entry := make([]string,numPermutations)
    entry[word] = newWord
    entry[ordered] = transform.SortAllCharacters(newWord)
+   entry[uniqueOrdered] = transform.UniqueSortedCharacters(newWord)
    return entry,nil
 }
