@@ -35,6 +35,10 @@ func (entry Entry) LettersOrdered() string {
   return entry[ordered]
 }
 
+func (entry Entry) UniqueLettersOrdered() string {
+  return entry[uniqueOrdered]
+}
+
 // Return a new dictionary entry from the given base word
 func NewEntryFromWord(newWord string) (Entry,error) {
 

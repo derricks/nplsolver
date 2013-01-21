@@ -15,6 +15,7 @@ type SolverType string
 const (
   Basic = "basic"
   Transposal = "transposal"
+  LetterBank = "letterbank"
 )
 
 // get an appropriate solver object
@@ -25,6 +26,8 @@ func GetSolver(solverType SolverType) (Solver,error) {
         solver = BasicSolver{}
      case Transposal:
         solver = TransposalSolver{}
+     case LetterBank:
+        solver = LetterBankSolver{}
    }
    
    if solver != nil {
@@ -96,6 +99,10 @@ func newRegexMatcher(regex string) (matcher Matcher, err error) {
   return regexMatcher{compiled},nil
 }
 
+func newSameUniqueCharacterMatcher() (Matcher, error) {
+   return sameUniqueCharacterMatcher{},nil
+}
+
 // The Matcher interface defines the ability to look at a word and see if it lines up with a dictionary entry.
 type Matcher interface {
     // Returns true if the given word (which is assumed to be the "raw" word) matches the dictionary entry.
@@ -139,6 +146,16 @@ func (matcher regexMatcher) Match(word string, dictEntry dict.Entry) bool {
 func (matcher regexMatcher) MatchTransformed(word string, dictEntry dict.Entry) bool {
    return matcher.Match(word,dictEntry)
 }
+
+// a matcher that ensures two words have the same unique letters
+type sameUniqueCharacterMatcher struct{}
+func (matcher sameUniqueCharacterMatcher) Match(word string, dictEntry dict.Entry) bool {
+  return matcher.MatchTransformed(transform.UniqueSortedCharacters(word),dictEntry)
+}
+func (matcher sameUniqueCharacterMatcher) MatchTransformed(word string, dictEntry dict.Entry) bool {
+  return word == dictEntry.UniqueLettersOrdered()
+}
+
 
 
      
