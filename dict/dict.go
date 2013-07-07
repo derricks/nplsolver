@@ -20,6 +20,7 @@ type Dictionary interface {
    
    // iterate over each entry in the dictionary, applying the relevant function
    Iterate(handler func(entry Entry))
+   
 }
 
 // refactored method for walking the dictionary entries and passing each entry to the function

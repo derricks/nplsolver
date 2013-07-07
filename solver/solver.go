@@ -16,6 +16,7 @@ const (
   Basic = "basic"
   Transposal = "transposal"
   LetterBank = "letterbank"
+  TransAddition = "transaddition"
 )
 
 // get an appropriate solver object
@@ -28,13 +29,15 @@ func GetSolver(solverType SolverType) (Solver,error) {
         solver = TransposalSolver{}
      case LetterBank:
         solver = LetterBankSolver{}
+     case TransAddition:
+        solver = TransAdditionSolver{}
    }
    
    if solver != nil {
      return solver,nil
    }
    
-   return nil,errors.New(fmt.Sprintf("No server found for type %v",solverType))
+   return nil,errors.New(fmt.Sprintf("No solver found for type %v",solverType))
 }
 
 
