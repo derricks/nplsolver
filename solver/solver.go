@@ -17,6 +17,7 @@ const (
   Transposal = "transposal"
   LetterBank = "letterbank"
   TransAddition = "transaddition"
+  Crypt = "crypt"
 )
 
 // get an appropriate solver object
@@ -31,6 +32,8 @@ func GetSolver(solverType SolverType) (Solver,error) {
         solver = LetterBankSolver{}
      case TransAddition:
         solver = TransAdditionSolver{}
+     case Crypt:
+        solver = CryptSolver{}
    }
    
    if solver != nil {
@@ -106,6 +109,10 @@ func newSameUniqueCharacterMatcher() (Matcher, error) {
    return sameUniqueCharacterMatcher{},nil
 }
 
+func newPatternMatcher() (Matcher, error) {
+   return samePatternMatcher{}, nil
+}
+
 // The Matcher interface defines the ability to look at a word and see if it lines up with a dictionary entry.
 type Matcher interface {
     // Returns true if the given word (which is assumed to be the "raw" word) matches the dictionary entry.
@@ -157,6 +164,16 @@ func (matcher sameUniqueCharacterMatcher) Match(word string, dictEntry dict.Entr
 }
 func (matcher sameUniqueCharacterMatcher) MatchTransformed(word string, dictEntry dict.Entry) bool {
   return word == dictEntry.UniqueLettersOrdered()
+}
+
+// a matcher that ensures two words have the same pattern
+type samePatternMatcher struct{}
+func (matcher samePatternMatcher) Match(word string, dictEntry dict.Entry) bool {
+  return matcher.MatchTransformed(transform.ToPattern(word), dictEntry)
+}
+
+func (matcher samePatternMatcher) MatchTransformed(word string, dictEntry dict.Entry) bool {
+  return word == dictEntry.Pattern()
 }
 
 

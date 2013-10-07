@@ -39,6 +39,10 @@ func (entry Entry) UniqueLettersOrdered() string {
   return entry[uniqueOrdered]
 }
 
+func (entry Entry) Pattern() string {
+  return entry[pattern]
+}
+
 // Return a new dictionary entry from the given base word
 func NewEntryFromWord(newWord string) (Entry,error) {
 
@@ -52,5 +56,6 @@ func NewEntryFromWord(newWord string) (Entry,error) {
    entry[word] = newWord
    entry[ordered] = transform.SortAllCharacters(newWord)
    entry[uniqueOrdered] = transform.UniqueSortedCharacters(newWord)
+   entry[pattern] = transform.ToPattern(newWord)
    return entry,nil
 }
