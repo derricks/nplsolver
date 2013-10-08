@@ -18,6 +18,7 @@ const (
   LetterBank = "letterbank"
   TransAddition = "transaddition"
   Crypt = "crypt"
+  Regex = "regex"
 )
 
 // get an appropriate solver object
@@ -34,6 +35,8 @@ func GetSolver(solverType SolverType) (Solver,error) {
         solver = TransAdditionSolver{}
      case Crypt:
         solver = CryptSolver{}
+     case Regex:
+        solver = RegexSolver{} 
    }
    
    if solver != nil {
