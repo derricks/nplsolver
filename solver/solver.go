@@ -35,14 +35,12 @@ func GetSolver(solverType SolverType) (Solver,error) {
         solver = TransAdditionSolver{}
      case Crypt:
         solver = CryptSolver{}
-     case Regex:
-        solver = RegexSolver{} 
    }
-   
+
    if solver != nil {
      return solver,nil
    }
-   
+
    return nil,errors.New(fmt.Sprintf("No solver found for type %v",solverType))
 }
 
@@ -50,12 +48,12 @@ func GetSolver(solverType SolverType) (Solver,error) {
 // The basic behavior for a Solver, a thing that works with a puzzle and a Dictionary to find matches.
 // matches are written to the receiving channel. when finished, the solver writes to done_channel (either itself or an error)
 type Solver interface {
-   Solve(pattern string, dict dict.Dictionary, sols_channel chan<- string, done_channel chan<- interface{}) 
+   Solve(pattern string, dict dict.Dictionary, sols_channel chan<- string, done_channel chan<- interface{})
 }
 
 type BasicSolver struct {}
 func (solver BasicSolver) Solve(pattern string, dictionary dict.Dictionary, results chan<- string, done_channel chan<- interface{}) {
-   
+
    regex := convertBasicSearchWildcardsToRegex(pattern)
    if matcher,err := newRegexMatcher(regex); err != nil {
       done_channel <- err
@@ -63,8 +61,8 @@ func (solver BasicSolver) Solve(pattern string, dictionary dict.Dictionary, resu
         dictionary.Iterate(func(entry dict.Entry) {
            if matcher.Match(regex,entry) {
               results <- entry.Word()
-           }      
-        })   
+           }
+        })
        done_channel <- solver
    }
 }
@@ -73,14 +71,14 @@ func (solver BasicSolver) Solve(pattern string, dictionary dict.Dictionary, resu
 func convertBasicSearchWildcardsToRegex(basicSearchPattern string) (regexPattern string) {
    regexPattern = strings.Replace(basicSearchPattern,"?",".",-1)
    regexPattern = strings.Replace(regexPattern,"*",".*",-1)
-   return "^" + regexPattern 
+   return "^" + regexPattern
 }
 
 type TransposalSolver struct{}
 func (solver TransposalSolver) Solve(pattern string, dictionary dict.Dictionary, results chan<- string, done_channel chan<- interface{}) {
     //transform the pattern into its ordered set of letters
     transformedString := transform.SortAllCharacters(pattern)
-    
+
     if matcher,err := newSameCharacterMatcher(); err != nil {
        done_channel <- err
     } else {
@@ -178,11 +176,3 @@ func (matcher samePatternMatcher) Match(word string, dictEntry dict.Entry) bool 
 func (matcher samePatternMatcher) MatchTransformed(word string, dictEntry dict.Entry) bool {
   return word == dictEntry.Pattern()
 }
-
-
-
-     
-
-
-
-
